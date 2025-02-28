@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dokumen Gereja</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            animation: fadeIn 1s ease-out;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            animation: slideIn 1s ease-out;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+            animation: fadeIn 1.5s ease-out;
+        }
+        .document-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .document-list li {
+            background-color: #ffffff;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .back-btn, .upload-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .back-btn:hover, .upload-btn:hover {
+            background-color: #c82333;
+        }
+        .upload-btn {
+            background-color: #28a745;
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+        }
+
+        .edit-btn, .delete-btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #ffc107;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            0% {
+                transform: translateY(-50px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Dokumen Keuskupan</h1>
+    </div>
+
+    <div class="content">
+        <h2>Daftar Dokumen Gereja Keuskupan Kelas 6 Antonius</h2>
+        <ul class="document-list" id="documentList">
+            <!-- Daftar dokumen akan ditampilkan di sini -->
+        </ul>
+
+        <input type="file" id="fileUpload" accept=".pdf,.docx,.pptx,.txt,.jpg,.png">
+        <button class="upload-btn" onclick="uploadDocument()">Upload Dokumen</button>
+
+        <button class="back-btn" onclick="window.location.href='login.html'">Log Out</button>
+    </div>
+
+    <script>
+        // Mendapatkan dokumen yang ada dari LocalStorage
+        function getDocuments() {
+            let documents = localStorage.getItem('documents');
+            return documents ? JSON.parse(documents) : [];
+        }
+
+        // Menyimpan dokumen ke LocalStorage
+        function saveDocuments(documents) {
+            localStorage.setItem('documents', JSON.stringify(documents));
+        }
+
+        // Fungsi untuk menampilkan dokumen yang ada
+        function renderDocuments() {
+            const documentList = document.getElementById('documentList');
+            const documents = getDocuments();
+            documentList.innerHTML = '';
+
+            documents.forEach((doc, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <span>${doc.name}</span>
+                    <div>
+                        <button class="edit-btn" onclick="editDocument(${index})">Edit</button>
+                        <button class="delete-btn" onclick="deleteDocument(${index})">Delete</button>
+                    </div>
+                `;
+                documentList.appendChild(listItem);
+            });
+        }
+
+        // Fungsi untuk meng-upload dokumen
+        function uploadDocument() {
+            const fileInput = document.getElementById('fileUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Silakan pilih dokumen untuk diupload.');
+                return;
+            }
+
+            const documents = getDocuments();
+            documents.push({ name: file.name, file: file });
+            saveDocuments(documents);
+            renderDocuments();
+            fileInput.value = ''; // Reset input file setelah upload
+        }
+
+        // Fungsi untuk mengedit dokumen
+        function editDocument(index) {
+            const documents = getDocuments();
+            const newName = prompt('Masukkan nama baru untuk dokumen:', documents[index].name);
+            if (newName) {
+                documents[index].name = newName;
+                saveDocuments(documents);
+                renderDocuments();
+            }
+        }
+
+        // Fungsi untuk menghapus dokumen
+        function deleteDocument(index) {
+            const documents = getDocuments();
+            documents.splice(index, 1);
+            saveDocuments(documents);
+            renderDocuments();
+        }
+
+        // Menampilkan dokumen saat halaman dimuat
+        window.onload = function() {
+            renderDocuments();
+        };
+    </script>
+
+</body>
+</html>
